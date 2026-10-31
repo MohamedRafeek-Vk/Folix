@@ -1,26 +1,28 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { PortfolioData, TemplateType } from './types/portfolio';
-import { LandingPage } from './components/LandingPage';
-import { ResumeUploader } from './components/ResumeUploader';
-import { ExtractedResumeEditor } from './components/ExtractedResumeEditor';
-import { TemplateGallery } from './components/TemplateGallery';
-import { PortfolioPreview } from './components/PortfolioPreview';
-import { PublishModal } from './components/PublishModal';
-import { PublishedPortfolio } from './components/PublishedPortfolio';
-import { SAMPLE_RESUMES } from './data/sampleResumes';
-import { savePortfolio, getPortfolioBySlug, getAllPortfolios } from './utils/storage';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { PortfolioData, TemplateType } from '../types/portfolio';
+import { LandingPage } from '../components/LandingPage';
+import { ResumeUploader } from '../components/ResumeUploader';
+import { ExtractedResumeEditor } from '../components/ExtractedResumeEditor';
+import { TemplateGallery } from '../components/TemplateGallery';
+import { PortfolioPreview } from '../components/PortfolioPreview';
+import { PublishModal } from '../components/PublishModal';
+import { SAMPLE_RESUMES } from '../data/sampleResumes';
+import { savePortfolio, getPortfolioBySlug, getAllPortfolios } from '../utils/storage';
 
-export type AppView = 'landing' | 'upload' | 'edit' | 'templates' | 'preview' | 'published';
+export type AppView = 'landing' | 'upload' | 'edit' | 'templates' | 'preview';
 
-export default function App() {
+export default function HomePage() {
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [view, setView] = useState<AppView>('landing');
-  const [publishedSlug, setPublishedSlug] = useState<string>('');
   const [uploadedFilename, setUploadedFilename] = useState<string>('');
   const [isPublishModalOpen, setIsPublishModalOpen] = useState<boolean>(false);
 
   // Active Portfolio Data being built
   const [currentPortfolio, setCurrentPortfolio] = useState<PortfolioData>(() => {
-    // Default starting point with sample developer data
     const devSample = SAMPLE_RESUMES.softwareEngineer;
     return {
       slug: 'rafeek',
@@ -41,9 +43,9 @@ export default function App() {
     };
   });
 
-  // Check URL path on load and on popstate for /p/:slug
   useEffect(() => {
-    // Pre-populate sample 'rafeek' into localStorage if not present, so /p/rafeek is immediately available!
+    setMounted(true);
+    // Pre-populate sample 'rafeek' into localStorage if not present
     const existing = getAllPortfolios();
     if (!existing['rafeek']) {
       savePortfolio({
@@ -54,31 +56,25 @@ export default function App() {
       });
     }
 
-    const checkRoute = () => {
-      const path = window.location.pathname;
-      const match = path.match(/^\/p\/([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) {
-        setPublishedSlug(match[1].toLowerCase());
-        setView('published');
-      } else {
-        // If at root
-        if (view === 'published') {
-          setView('landing');
+    // Check if URL has ?edit=slug
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const editSlug = params.get('edit');
+      if (editSlug) {
+        const item = getPortfolioBySlug(editSlug);
+        if (item) {
+          setCurrentPortfolio(item);
+          setView('edit');
         }
       }
-    };
-
-    checkRoute();
-    window.addEventListener('popstate', checkRoute);
-    return () => window.removeEventListener('popstate', checkRoute);
+    }
   }, []);
 
-  const navigateTo = (newView: AppView, newPath?: string) => {
+  const navigateTo = (newView: AppView) => {
     setView(newView);
-    if (newPath) {
-      window.history.pushState({}, '', newPath);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // 1. Resume Parsed Callback
@@ -117,17 +113,15 @@ export default function App() {
     navigateTo('preview');
   };
 
-  // 5. Publish Success
+  // 5. Publish Success -> Redirect to /p/[slug]
   const handlePublishSuccess = (newSlug: string) => {
     setIsPublishModalOpen(false);
-    setPublishedSlug(newSlug);
-    navigateTo('published', `/p/${newSlug}`);
+    router.push(`/p/${newSlug}`);
   };
 
   // 6. View Published Portfolio
   const handleViewPublished = (slug: string) => {
-    setPublishedSlug(slug);
-    navigateTo('published', `/p/${slug}`);
+    router.push(`/p/${slug}`);
   };
 
   // 7. Edit an existing portfolio
@@ -135,6 +129,17 @@ export default function App() {
     setCurrentPortfolio(data);
     navigateTo('edit');
   };
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center font-sans">
+        <div className="space-y-3 text-center">
+          <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-xs text-slate-400 font-mono">Loading Folix...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
@@ -181,14 +186,6 @@ export default function App() {
           onBackToTemplates={() => navigateTo('templates')}
           onPublishClick={() => setIsPublishModalOpen(true)}
           onTemplateChange={handleSelectTemplate}
-        />
-      )}
-
-      {view === 'published' && (
-        <PublishedPortfolio
-          slug={publishedSlug}
-          onEdit={handleEditExisting}
-          onHomeClick={() => navigateTo('landing', '/')}
         />
       )}
 

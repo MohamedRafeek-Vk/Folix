@@ -244,7 +244,7 @@ export const MinimalTemplate: React.FC<{ data: PortfolioData }> = ({ data }) => 
 
       {/* Footer */}
       <footer className="border-t border-zinc-200 py-8 text-center text-xs text-zinc-500">
-        <p>© {new Date().getFullYear()} {data.name || 'Portfolio'}. Generated with PortfolioAI.</p>
+        <p>© {new Date().getFullYear()} {data.name || 'Portfolio'}. Generated with Folix.</p>
       </footer>
     </div>
   );

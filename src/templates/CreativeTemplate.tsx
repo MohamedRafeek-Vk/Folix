@@ -213,7 +213,7 @@ export const CreativeTemplate: React.FC<{ data: PortfolioData }> = ({ data }) =>
       </main>
 
       <footer className="relative z-10 border-t border-white/[0.08] py-8 text-center text-xs text-slate-500 font-mono">
-        <p>© {new Date().getFullYear()} {data.name || 'Creative'}. Generated via PortfolioAI.</p>
+        <p>© {new Date().getFullYear()} {data.name || 'Creative'}. Generated via Folix.</p>
       </footer>
     </div>
   );

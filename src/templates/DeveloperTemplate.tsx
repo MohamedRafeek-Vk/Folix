@@ -228,7 +228,7 @@ export const DeveloperTemplate: React.FC<{ data: PortfolioData }> = ({ data }) =
 
       {/* Terminal Footer */}
       <footer className="border-t border-[#30363d] py-6 text-center text-xs text-[#8b949e]">
-        <p>exit 0 • Built with PortfolioAI</p>
+        <p>exit 0 • Built with Folix</p>
       </footer>
     </div>
   );

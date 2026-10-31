@@ -47,12 +47,12 @@ export const LandingPage: React.FC<Props> = ({
                 <Sparkles className="w-5 h-5 text-indigo-400" />
               </div>
             </div>
-            <div>
+            <div className="flex items-center">
               <span className="font-extrabold text-xl tracking-tight text-white flex items-center gap-1.5">
-                Portfolio<span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">AI</span>
+                Folix<span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">.</span>
               </span>
-              <span className="hidden sm:inline-block text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 ml-2">
-                MVP
+              <span className="hidden sm:inline-block text-xs text-slate-400 font-medium ml-2 pl-2 border-l border-white/10">
+                instant portfolio generator
               </span>
             </div>
           </div>
@@ -297,10 +297,10 @@ export const LandingPage: React.FC<Props> = ({
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span className="font-semibold text-slate-400">PortfolioAI</span>
-            <span>— The instant resume to website platform.</span>
+            <span className="font-semibold text-slate-300">Folix</span>
+            <span>— Instant portfolio generator. Turn your resume into a portfolio in seconds.</span>
           </div>
-          <p>© {new Date().getFullYear()} PortfolioAI. Client-side browser storage.</p>
+          <p>© {new Date().getFullYear()} Folix. Client-side browser storage.</p>
         </div>
       </footer>
 

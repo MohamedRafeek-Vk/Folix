@@ -1,11 +1,12 @@
 import { PortfolioData } from '../types/portfolio';
 
-const STORAGE_KEY = 'portfolioai_portfolios';
+const PRIMARY_STORAGE_KEY = 'folix_portfolios';
+const LEGACY_STORAGE_KEY = 'portfolioai_portfolios';
 
 export function getAllPortfolios(): Record<string, PortfolioData> {
   if (typeof window === 'undefined') return {};
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(PRIMARY_STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
     return raw ? JSON.parse(raw) : {};
   } catch (err) {
     console.error('Failed to read portfolios from localStorage:', err);
@@ -34,7 +35,7 @@ export function savePortfolio(data: PortfolioData): { success: boolean; overwrit
     };
 
     all[cleanSlug] = toStore;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    localStorage.setItem(PRIMARY_STORAGE_KEY, JSON.stringify(all));
     return { success: true, overwritten: alreadyExists };
   } catch (err) {
     console.error('Failed to save portfolio to localStorage:', err);
@@ -48,7 +49,7 @@ export function deletePortfolio(slug: string): boolean {
     const all = getAllPortfolios();
     if (all[cleanSlug]) {
       delete all[cleanSlug];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+      localStorage.setItem(PRIMARY_STORAGE_KEY, JSON.stringify(all));
       return true;
     }
     return false;

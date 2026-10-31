@@ -264,7 +264,7 @@ export const ModernTemplate: React.FC<{ data: PortfolioData }> = ({ data }) => {
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/[0.06] py-8 text-center text-xs text-slate-500">
-        <p>© {new Date().getFullYear()} {data.name || 'Portfolio'}. Powered by PortfolioAI.</p>
+        <p>© {new Date().getFullYear()} {data.name || 'Portfolio'}. Powered by Folix.</p>
       </footer>
     </div>
   );

@@ -1,11 +1,4 @@
 import { PortfolioData, WorkExperience, Education, Project, Certification, SocialLinks } from '../types/portfolio';
-import * as mammoth from 'mammoth';
-import * as pdfjsLib from 'pdfjs-dist';
-
-// Configure pdfjs worker
-if (typeof window !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-}
 
 export interface ParseResult {
   text: string;
@@ -16,29 +9,82 @@ export interface ParseResult {
 export async function extractTextFromFile(file: File): Promise<string> {
   const extension = file.name.split('.').pop()?.toLowerCase();
 
+  // 1. DOCX parser
   if (extension === 'docx') {
-    const arrayBuffer = await file.arrayBuffer();
-    const result = await mammoth.extractRawText({ arrayBuffer });
-    return result.value;
-  } else if (extension === 'pdf') {
-    const arrayBuffer = await file.arrayBuffer();
-    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-    const pdf = await loadingTask.promise;
-    let fullText = '';
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items
-        .map((item: any) => item.str)
-        .join(' ');
-      fullText += pageText + '\n\n';
+    if (typeof window !== 'undefined' && (window as any).mammoth) {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await (window as any).mammoth.extractRawText({ arrayBuffer });
+        if (result && result.value) return result.value;
+      } catch (e) {
+        // Fall back to direct XML extraction below
+      }
     }
-    return fullText;
-  } else {
-    // Fallback for txt or other raw text files
-    return await file.text();
+
+    const buffer = await file.arrayBuffer();
+    const decoder = new TextDecoder('utf-8', { fatal: false });
+    const content = decoder.decode(buffer);
+
+    // Extract Word XML text tags <w:t>...</w:t>
+    const matches = content.match(/<w:t[^>]*>(.*?)<\/w:t>/g);
+    if (matches && matches.length > 0) {
+      return matches.map(m => m.replace(/<\/?[^>]+(>|$)/g, '')).join(' ');
+    }
+
+    const words = content.match(/[A-Za-z0-9@.,:\-\(\)\s]{4,}/g);
+    return words ? words.join(' ') : content;
   }
+  
+  // 2. PDF parser
+  if (extension === 'pdf') {
+    if (typeof window !== 'undefined' && (window as any).pdfjsLib) {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await (window as any).pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items.map((item: any) => item.str).join(' ');
+          fullText += pageText + '\n\n';
+        }
+        if (fullText.trim().length > 20) return fullText;
+      } catch (e) {
+        // Fall back to direct stream parser
+      }
+    }
+
+    // Direct stream parser for PDF text operators
+    const buffer = await file.arrayBuffer();
+    const decoder = new TextDecoder('latin1');
+    const content = decoder.decode(buffer);
+
+    const textPieces: string[] = [];
+    const textMatches = content.match(/\(([^()]{2,})\)\s*Tj/g) || [];
+    for (const m of textMatches) {
+      const clean = m.replace(/^\(/, '').replace(/\)\s*Tj$/, '').trim();
+      if (clean && !/^[\\\/\d]+$/.test(clean)) {
+        textPieces.push(clean);
+      }
+    }
+
+    const arrayMatches = content.match(/\[([^\[\]]+)\]\s*TJ/g) || [];
+    for (const arr of arrayMatches) {
+      const inner = arr.match(/\(([^()]+)\)/g) || [];
+      const joined = inner.map(i => i.slice(1, -1)).join(' ');
+      if (joined) textPieces.push(joined);
+    }
+
+    if (textPieces.length > 5) {
+      return textPieces.join('\n');
+    }
+
+    const readable = content.match(/[A-Za-z0-9@.,:\-\/+\(\)\s]{4,}/g);
+    return readable ? readable.filter(s => /[a-zA-Z]{3,}/.test(s)).join('\n') : '';
+  }
+
+  // 3. Plain text or markdown
+  return await file.text();
 }
 
 export function parseResumeText(rawText: string): Partial<PortfolioData> {

@@ -1,0 +1,44 @@
+Alex Turner
+Lead Cloud Architect & Principal Engineer
+alex.turner@cloudtech.io | +1 (555) 839-2041 | Seattle, WA
+GitHub: https://github.com/alexturner | LinkedIn: https://linkedin.com/in/alexturner | Website: https://alexturner.cloud
+
+SUMMARY
+Results-driven Cloud Architect and Distributed Systems Engineer with 8+ years leading multi-region cloud migrations, high-throughput event architectures, and resilient infrastructure. Passionate about Kubernetes, Go microservices, cost optimization, and developer productivity platforms.
+
+SKILLS
+Go, Python, TypeScript, Docker, Kubernetes, AWS, Terraform, Kafka, Redis, PostgreSQL, Helm, Prometheus, Istio, System Architecture, CI/CD, Microservices
+
+WORK EXPERIENCE
+Principal Cloud Architect — CloudScale Systems (Seattle, WA)
+2022 – Present
+• Designed global multi-region AWS cloud infrastructure handling 2.5B+ monthly API requests with 99.995% SLA.
+• Led cloud financial engineering initiative reducing AWS spend by $1.4M annually across compute and data transfer.
+• Implemented automated GitOps delivery pipelines reducing deployment cycle time from 3 hours to 12 minutes.
+
+Senior Systems Engineer — Aurora Networks (San Francisco, CA)
+2019 – 2022
+• Re-architected core messaging bus using Apache Kafka and Redis cluster, achieving sub-5ms message ingestion latency.
+• Mentored cross-functional team of 14 cloud engineers and established company-wide infrastructure-as-code standards.
+
+Software Engineer — Nexus Labs (Portland, OR)
+2016 – 2019
+• Built scalable REST and gRPC microservices in Go and Python.
+• Automated database failover and read-replica routing for PostgreSQL clusters.
+
+EDUCATION
+B.S. in Computer Engineering — University of Washington (Seattle, WA)
+Graduated 2016
+
+KEY PROJECTS
+KubeFleet Multi-Cluster Manager
+Open-source CLI and dashboard for coordinating configuration drift, security compliance, and secrets across 50+ Kubernetes clusters.
+Stack: Go, Kubernetes Client-go, React, Docker
+
+Serverless Event Router
+High-throughput distributed event dispatching engine with dead-letter queue recovery and dynamic routing filters.
+Stack: Go, AWS Lambda, DynamoDB, Terraform
+
+CERTIFICATIONS
+• AWS Certified Solutions Architect – Professional (Amazon Web Services, 2023)
+• Certified Kubernetes Security Specialist - CKS (CNCF, 2022)

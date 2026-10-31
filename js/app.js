@@ -2247,28 +2247,10 @@ class PortfolioApp {
   }
 }
 
-// Instantiate global application in browser
-if (typeof window !== 'undefined') {
-  let app;
-  window.addEventListener('DOMContentLoaded', () => {
-    app = new PortfolioApp();
-    window.app = app;
-  });
-}
-
-// Fallback for Vercel Serverless Function runtime if invoked by Node.js
-export default function handler(req, res) {
-  if (res && typeof res.setHeader === 'function') {
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.statusCode = 200;
-    try {
-      const fs = require('fs');
-      const path = require('path');
-      const html = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf-8');
-      res.end(html);
-    } catch (e) {
-      res.end('<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/index.html"></head><body>Loading...</body></html>');
-    }
-  }
-}
+// Instantiate global application
+let app;
+window.addEventListener('DOMContentLoaded', () => {
+  app = new PortfolioApp();
+  window.app = app;
+});
 

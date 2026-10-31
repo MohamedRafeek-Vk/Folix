@@ -15,6 +15,17 @@
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
     rel="stylesheet">
 
+  <!-- Suppress CDN dev warning in console -->
+  <script>
+    (function(){
+      const w = console.warn;
+      console.warn = function(...args) {
+        if (typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+        w.apply(console, args);
+      };
+    })();
+  </script>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -95,7 +106,7 @@
   <div id="modal-container"></div>
 
   <!-- Main Application Logic -->
-  <script src="/app.js"></script>
+  <script src="/js/app.js"></script>
 </body>
 
 </html>

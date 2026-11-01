@@ -1,17 +1,19 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { Suspense, useEffect, useState } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { PortfolioData } from '../../../types/portfolio';
-import { getPortfolioBySlug } from '../../../utils/storage';
+import { fetchPublishedPortfolio, getPublicPortfolioUrl } from '../../../utils/storage';
 import { TemplateRenderer } from '../../../templates/TemplateRenderer';
 import { NotFoundPage } from '../../../components/NotFoundPage';
 import { Sparkles, Edit3, Share2, Check } from 'lucide-react';
 
-export default function PublishedPortfolioPage() {
+function PublishedPortfolioContent() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const slug = (params?.slug as string) || '';
+  const idParam = searchParams?.get('id') || undefined;
 
   const [data, setData] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -19,18 +21,38 @@ export default function PublishedPortfolioPage() {
 
   useEffect(() => {
     if (!slug) return;
+    let isCancelled = false;
     setLoading(true);
-    const found = getPortfolioBySlug(slug);
-    setData(found);
-    setLoading(false);
-  }, [slug]);
+
+    async function loadPortfolio() {
+      try {
+        const found = await fetchPublishedPortfolio(slug, idParam);
+        if (!isCancelled) {
+          setData(found);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Error loading portfolio:', err);
+        if (!isCancelled) {
+          setData(null);
+          setLoading(false);
+        }
+      }
+    }
+
+    loadPortfolio();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [slug, idParam]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center font-sans">
         <div className="space-y-3 text-center">
           <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs text-slate-400 font-mono">Loading /p/{slug}...</p>
+          <p className="text-xs text-slate-400 font-mono">Loading portfolio /p/{slug}...</p>
         </div>
       </div>
     );
@@ -47,14 +69,15 @@ export default function PublishedPortfolioPage() {
 
   const handleShare = () => {
     if (typeof window !== 'undefined') {
-      navigator.clipboard.writeText(window.location.href);
+      const shareUrl = getPublicPortfolioUrl(slug);
+      navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
   const handleEdit = () => {
-    router.push(`/?edit=${slug}`);
+    router.push(`/?edit=${encodeURIComponent(slug)}`);
   };
 
   const handleHomeClick = () => {
@@ -97,5 +120,22 @@ export default function PublishedPortfolioPage() {
       {/* Render the selected template */}
       <TemplateRenderer data={data} />
     </div>
+  );
+}
+
+export default function PublishedPortfolioPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center font-sans">
+          <div className="space-y-3 text-center">
+            <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-xs text-slate-400 font-mono">Loading portfolio...</p>
+          </div>
+        </div>
+      }
+    >
+      <PublishedPortfolioContent />
+    </Suspense>
   );
 }

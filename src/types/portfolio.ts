@@ -58,11 +58,15 @@ export interface PortfolioData {
   email: string;
   phone?: string;
   location?: string;
+  profileImage?: string;
   skills: string[];
+  technicalSkills?: string[];
+  softSkills?: string[];
   experience: WorkExperience[];
   education: Education[];
   projects: Project[];
   certifications: Certification[];
+  achievements?: string[];
   socialLinks: SocialLinks;
   selectedTemplate: TemplateType;
   publishedAt: string;

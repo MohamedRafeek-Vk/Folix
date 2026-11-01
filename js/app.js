@@ -1168,16 +1168,6 @@ class PortfolioApp {
   }
 
   init() {
-    // Seed default demo 'rafeek' in localStorage if empty
-    const all = getAllPortfolios();
-    if (!all['rafeek']) {
-      savePortfolio({
-        ...this.currentPortfolio,
-        slug: 'rafeek',
-        selectedTemplate: 'modern'
-      });
-    }
-
     // Bind URL router
     window.addEventListener('popstate', () => this.handleRouting());
     this.handleRouting();
@@ -1506,10 +1496,23 @@ class PortfolioApp {
       const parsed = parseResumeText(text);
 
       this.uploadedFilename = file.name;
+      const firstWord = (parsed.name || 'portfolio').trim().split(/\s+/)[0] || 'portfolio';
       this.currentPortfolio = {
-        ...this.currentPortfolio,
-        ...parsed,
-        slug: sanitizeSlug(parsed.name?.split(' ')[0] || 'portfolio')
+        slug: sanitizeSlug(firstWord),
+        name: parsed.name || '',
+        profession: parsed.profession || '',
+        summary: parsed.summary || '',
+        email: parsed.email || '',
+        phone: parsed.phone || '',
+        location: parsed.location || '',
+        skills: parsed.skills || [],
+        experience: parsed.experience || [],
+        education: parsed.education || [],
+        projects: parsed.projects || [],
+        certifications: parsed.certifications || [],
+        socialLinks: parsed.socialLinks || {},
+        selectedTemplate: this.selectedTemplate || 'modern',
+        publishedAt: new Date().toISOString()
       };
 
       this.navigateTo('edit');

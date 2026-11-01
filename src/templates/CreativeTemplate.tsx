@@ -1,8 +1,31 @@
 import React from 'react';
 import { PortfolioData } from '../types/portfolio';
-import { Sparkles, Palette, ArrowUpRight, Mail, MapPin, Globe, Github, Linkedin, Twitter, Compass } from 'lucide-react';
+import { Sparkles, Palette, ArrowUpRight, Mail, MapPin, Globe, Github, Linkedin, Twitter, GraduationCap, Award } from 'lucide-react';
 
 export const CreativeTemplate: React.FC<{ data: PortfolioData }> = ({ data }) => {
+  // Sort experience & education descending (most recent first)
+  const sortedExperience = [...(data.experience || [])].sort((a, b) => {
+    const isCurrentA = a.current || /present|current|ongoing/i.test(a.endDate || '');
+    const isCurrentB = b.current || /present|current|ongoing/i.test(b.endDate || '');
+    if (isCurrentA && !isCurrentB) return -1;
+    if (!isCurrentA && isCurrentB) return 1;
+    const yearA = (a.endDate || a.startDate || '').match(/(?:19|20)\d{2}/);
+    const yearB = (b.endDate || b.startDate || '').match(/(?:19|20)\d{2}/);
+    const valA = yearA ? parseInt(yearA[0], 10) : 0;
+    const valB = yearB ? parseInt(yearB[0], 10) : 0;
+    return valB - valA;
+  });
+
+  const sortedEducation = [...(data.education || [])].sort((a, b) => {
+    const yearA = (a.endYear || a.startYear || '').match(/(?:19|20)\d{2}/);
+    const yearB = (b.endYear || b.startYear || '').match(/(?:19|20)\d{2}/);
+    const valA = yearA ? parseInt(yearA[0], 10) : 0;
+    const valB = yearB ? parseInt(yearB[0], 10) : 0;
+    return valB - valA;
+  });
+
+  const hasCertificationsOrAchievements = (data.certifications && data.certifications.length > 0) || (data.achievements && data.achievements.length > 0);
+
   return (
     <div className="min-h-screen bg-[#121118] text-[#f4efe6] font-sans selection:bg-amber-400/30 selection:text-amber-200">
       {/* Decorative Warm Light Background */}
@@ -22,8 +45,11 @@ export const CreativeTemplate: React.FC<{ data: PortfolioData }> = ({ data }) =>
           </div>
 
           <nav className="flex items-center gap-6 text-xs uppercase tracking-widest text-slate-300">
+            {data.summary && <a href="#about" className="hover:text-amber-300 transition">About</a>}
+            {data.skills?.length > 0 && <a href="#skills" className="hover:text-amber-300 transition">Toolkit</a>}
+            {sortedExperience.length > 0 && <a href="#story" className="hover:text-amber-300 transition">Story</a>}
             {data.projects?.length > 0 && <a href="#work" className="hover:text-amber-300 transition">Work</a>}
-            {data.experience?.length > 0 && <a href="#story" className="hover:text-amber-300 transition">Story</a>}
+            {sortedEducation.length > 0 && <a href="#education" className="hover:text-amber-300 transition">Education</a>}
             <a href="#contact" className="px-4 py-2 rounded-full border border-amber-400/40 hover:bg-amber-400 hover:text-black transition duration-300 font-medium">
               Let's Talk
             </a>
@@ -32,16 +58,25 @@ export const CreativeTemplate: React.FC<{ data: PortfolioData }> = ({ data }) =>
       </header>
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 py-20 space-y-28">
-        {/* Hero Section */}
+        {/* 1. Hero Section */}
         <section className="space-y-8 pt-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-gradient-to-r from-amber-500/10 to-rose-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span>Creative Portfolio & Works</span>
           </div>
 
-          <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight leading-[1.08] text-white">
-            Crafting experiences at the intersection of <span className="italic font-serif font-normal bg-gradient-to-r from-amber-300 via-rose-300 to-amber-200 bg-clip-text text-transparent">design</span> and <span className="underline decoration-rose-500/50 underline-offset-8">technology</span>.
-          </h1>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+            {data.profileImage && (
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden border-2 border-amber-400/40 shadow-2xl shadow-amber-500/10 shrink-0">
+                <img src={data.profileImage} alt={data.name} className="w-full h-full object-cover" />
+              </div>
+            )}
+            <div>
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.08] text-white">
+                Crafting experiences at the intersection of <span className="italic font-serif font-normal bg-gradient-to-r from-amber-300 via-rose-300 to-amber-200 bg-clip-text text-transparent">design</span> and <span className="underline decoration-rose-500/50 underline-offset-8">technology</span>.
+              </h1>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 border-t border-white/[0.08]">
             <div>
@@ -51,9 +86,9 @@ export const CreativeTemplate: React.FC<{ data: PortfolioData }> = ({ data }) =>
             </div>
 
             <div className="md:col-span-2">
-              <p className="text-xs uppercase tracking-widest text-amber-300/70 font-mono">Philosophy</p>
+              <p className="text-xs uppercase tracking-widest text-amber-300/70 font-mono">Discipline</p>
               <p className="text-sm sm:text-base text-slate-300 mt-1 leading-relaxed">
-                {data.summary || 'Designing meaningful digital products and brands that blend beauty, empathy, and seamless functionality.'}
+                Specialized in human-centered aesthetics, elegant interfaces, and resilient digital architectures.
               </p>
             </div>
           </div>
@@ -74,22 +109,22 @@ export const CreativeTemplate: React.FC<{ data: PortfolioData }> = ({ data }) =>
             )}
             <div className="flex items-center gap-3 ml-auto">
               {data.socialLinks?.github && (
-                <a href={data.socialLinks.github} target="_blank" rel="noreferrer" className="hover:text-amber-300 transition">
+                <a href={data.socialLinks.github} target="_blank" rel="noreferrer" className="hover:text-amber-300 transition" title="GitHub">
                   <Github className="w-4 h-4" />
                 </a>
               )}
               {data.socialLinks?.linkedin && (
-                <a href={data.socialLinks.linkedin} target="_blank" rel="noreferrer" className="hover:text-amber-300 transition">
+                <a href={data.socialLinks.linkedin} target="_blank" rel="noreferrer" className="hover:text-amber-300 transition" title="LinkedIn">
                   <Linkedin className="w-4 h-4" />
                 </a>
               )}
               {data.socialLinks?.twitter && (
-                <a href={data.socialLinks.twitter} target="_blank" rel="noreferrer" className="hover:text-amber-300 transition">
+                <a href={data.socialLinks.twitter} target="_blank" rel="noreferrer" className="hover:text-amber-300 transition" title="Twitter">
                   <Twitter className="w-4 h-4" />
                 </a>
               )}
               {data.socialLinks?.website && (
-                <a href={data.socialLinks.website} target="_blank" rel="noreferrer" className="hover:text-amber-300 transition">
+                <a href={data.socialLinks.website} target="_blank" rel="noreferrer" className="hover:text-amber-300 transition" title="Website">
                   <Globe className="w-4 h-4" />
                 </a>
               )}
@@ -97,7 +132,105 @@ export const CreativeTemplate: React.FC<{ data: PortfolioData }> = ({ data }) =>
           </div>
         </section>
 
-        {/* Selected Works Gallery */}
+        {/* 2. About Me */}
+        {data.summary && (
+          <section id="about" className="space-y-6">
+            <div className="border-b border-white/[0.08] pb-3">
+              <span className="text-xs font-mono uppercase tracking-widest text-amber-300/70">Philosophy & Profile</span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mt-1">About Me</h2>
+            </div>
+            <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/[0.06]">
+              <p className="text-base sm:text-lg text-slate-300 leading-relaxed font-normal">
+                {data.summary}
+              </p>
+            </div>
+          </section>
+        )}
+
+        {/* 3. Skills: Creative Toolkit */}
+        {data.skills?.length > 0 && (
+          <section id="skills" className="space-y-6">
+            <div className="border-b border-white/[0.08] pb-3">
+              <span className="text-xs font-mono uppercase tracking-widest text-amber-300/70">Capabilities</span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mt-1">Creative Toolkit</h2>
+            </div>
+
+            <div className="space-y-6">
+              {data.technicalSkills && data.technicalSkills.length > 0 && (
+                <div className="space-y-3">
+                  <span className="text-xs font-mono uppercase tracking-wider text-amber-300/60">Technical & Systems</span>
+                  <div className="flex flex-wrap gap-2.5">
+                    {data.technicalSkills.map((skill, i) => (
+                      <span key={i} className="px-4 py-2 rounded-2xl text-xs font-medium bg-white/[0.04] border border-white/[0.08] hover:border-amber-400/50 hover:bg-amber-400/10 text-slate-200 transition">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {data.softSkills && data.softSkills.length > 0 && (
+                <div className="space-y-3">
+                  <span className="text-xs font-mono uppercase tracking-wider text-rose-300/60">Core Practices & Collaboration</span>
+                  <div className="flex flex-wrap gap-2.5">
+                    {data.softSkills.map((skill, i) => (
+                      <span key={i} className="px-4 py-2 rounded-2xl text-xs font-medium bg-rose-500/10 border border-rose-500/20 text-rose-200 transition">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(!data.technicalSkills || data.technicalSkills.length === 0) && (!data.softSkills || data.softSkills.length === 0) && (
+                <div className="flex flex-wrap gap-2.5">
+                  {data.skills.map((skill, i) => (
+                    <span key={i} className="px-4 py-2 rounded-2xl text-xs font-medium bg-white/[0.04] border border-white/[0.08] hover:border-amber-400/50 hover:bg-amber-400/10 text-slate-200 transition">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* 4. Experience Story */}
+        {sortedExperience.length > 0 && (
+          <section id="story" className="space-y-8">
+            <div className="border-b border-white/[0.08] pb-4">
+              <span className="text-xs font-mono uppercase tracking-widest text-rose-300/70">The Journey</span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mt-1">Creative Experience</h2>
+            </div>
+
+            <div className="space-y-6">
+              {sortedExperience.map(exp => (
+                <div key={exp.id} className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] transition space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                    <h3 className="text-xl font-bold text-white">{exp.role}</h3>
+                    <span className="text-xs font-mono text-amber-300/80">{exp.startDate} – {exp.endDate}</span>
+                  </div>
+                  <p className="text-sm font-medium text-slate-400">{exp.company} {exp.location ? `• ${exp.location}` : ''}</p>
+                  {exp.description && (
+                    <p className="text-sm text-slate-300 leading-relaxed">{exp.description}</p>
+                  )}
+                  {exp.highlights && exp.highlights.length > 0 && (
+                    <ul className="space-y-1 pt-1">
+                      {exp.highlights.map((h, i) => (
+                        <li key={i} className="text-sm text-slate-400 flex items-start gap-2">
+                          <span className="text-amber-400 mt-1">✦</span>
+                          <span>{h}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 5. Selected Works Gallery */}
         {data.projects?.length > 0 && (
           <section id="work" className="space-y-8">
             <div className="flex items-end justify-between border-b border-white/[0.08] pb-4">
@@ -145,56 +278,68 @@ export const CreativeTemplate: React.FC<{ data: PortfolioData }> = ({ data }) =>
           </section>
         )}
 
-        {/* Experience Story */}
-        {data.experience?.length > 0 && (
-          <section id="story" className="space-y-8">
+        {/* 6. Education */}
+        {sortedEducation.length > 0 && (
+          <section id="education" className="space-y-6">
             <div className="border-b border-white/[0.08] pb-4">
-              <span className="text-xs font-mono uppercase tracking-widest text-rose-300/70">The Journey</span>
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mt-1">Creative Experience</h2>
+              <span className="text-xs font-mono uppercase tracking-widest text-amber-300/70">Foundation</span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mt-1">Academic Background</h2>
             </div>
 
-            <div className="space-y-6">
-              {data.experience.map(exp => (
-                <div key={exp.id} className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] transition space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                    <h3 className="text-xl font-bold text-white">{exp.role}</h3>
-                    <span className="text-xs font-mono text-amber-300/80">{exp.startDate} – {exp.endDate}</span>
+            <div className="space-y-4">
+              {sortedEducation.map(edu => (
+                <div key={edu.id} className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h3 className="text-lg font-bold text-white">{edu.degree}</h3>
+                    <p className="text-sm text-slate-400">{edu.institution} {edu.location ? `• ${edu.location}` : ''}</p>
+                    {edu.fieldOfStudy && <p className="text-xs text-amber-300/80 font-mono mt-0.5">{edu.fieldOfStudy}</p>}
                   </div>
-                  <p className="text-sm font-medium text-slate-400">{exp.company} {exp.location ? `• ${exp.location}` : ''}</p>
-                  {exp.description && (
-                    <p className="text-sm text-slate-300 leading-relaxed">{exp.description}</p>
-                  )}
-                  {exp.highlights && exp.highlights.length > 0 && (
-                    <ul className="space-y-1 pt-1">
-                      {exp.highlights.map((h, i) => (
-                        <li key={i} className="text-sm text-slate-400 flex items-start gap-2">
-                          <span className="text-amber-400 mt-1">✦</span>
-                          <span>{h}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  <span className="text-xs font-mono text-amber-300/70 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] w-fit">
+                    {edu.endYear}
+                  </span>
                 </div>
               ))}
             </div>
           </section>
         )}
 
-        {/* Creative Toolkit / Skills */}
-        {data.skills?.length > 0 && (
-          <section className="space-y-6">
-            <span className="text-xs font-mono uppercase tracking-widest text-amber-300/70">Creative Toolkit</span>
-            <div className="flex flex-wrap gap-2.5">
-              {data.skills.map((skill, i) => (
-                <span key={i} className="px-4 py-2 rounded-2xl text-xs font-medium bg-white/[0.04] border border-white/[0.08] hover:border-amber-400/50 hover:bg-amber-400/10 text-slate-200 transition">
-                  {skill}
-                </span>
-              ))}
+        {/* 7. Certifications & Achievements */}
+        {hasCertificationsOrAchievements && (
+          <section id="certifications" className="space-y-6">
+            <div className="border-b border-white/[0.08] pb-4">
+              <span className="text-xs font-mono uppercase tracking-widest text-rose-300/70">Recognition</span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mt-1">Certifications & Honors</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {data.certifications && data.certifications.length > 0 && (
+                <div className="space-y-3">
+                  <span className="text-xs font-mono text-amber-300/80 uppercase">Accreditations</span>
+                  {data.certifications.map(c => (
+                    <div key={c.id} className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] space-y-1">
+                      <h4 className="font-semibold text-white text-sm">{c.name}</h4>
+                      <p className="text-xs text-slate-400">{c.issuer} {c.date ? `• ${c.date}` : ''}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {data.achievements && data.achievements.length > 0 && (
+                <div className="space-y-3">
+                  <span className="text-xs font-mono text-rose-300/80 uppercase">Honors & Awards</span>
+                  {data.achievements.map((ach, idx) => (
+                    <div key={idx} className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] flex items-start gap-2.5 text-xs text-slate-300">
+                      <span className="text-amber-400">✦</span>
+                      <span>{ach}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </section>
         )}
 
-        {/* Contact Banner */}
+        {/* 8. Contact Banner */}
         <section id="contact" className="p-10 sm:p-14 rounded-3xl bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-purple-500/10 border border-amber-500/20 text-center space-y-6">
           <Palette className="w-8 h-8 text-amber-400 mx-auto" />
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white">Let's create something memorable.</h2>

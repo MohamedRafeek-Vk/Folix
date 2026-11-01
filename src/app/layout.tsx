@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -25,6 +26,8 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
+        <Script src="/vendor/pdf.min.js" strategy="beforeInteractive" />
+        <Script src="/vendor/mammoth.browser.min.js" strategy="beforeInteractive" />
         {children}
       </body>
     </html>

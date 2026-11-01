@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { UploadCloud, FileText, CheckCircle2, AlertCircle, ArrowRight, Loader2, Sparkles, FileCode, UserCheck } from 'lucide-react';
-import { extractTextFromFile, parseResumeText } from '../utils/resumeParser';
+import { extractDocumentFromFile, parseResumeText } from '../utils/resumeParser';
 import { PortfolioData } from '../types/portfolio';
 import { SAMPLE_RESUMES } from '../data/sampleResumes';
 
@@ -37,14 +37,16 @@ export const ResumeUploader: React.FC<Props> = ({ onParsed, onCancel }) => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      processSelectedFile(e.target.files[0]);
+      const selected = e.target.files[0];
+      e.target.value = '';
+      processSelectedFile(selected);
     }
   };
 
   const processSelectedFile = async (selectedFile: File) => {
     const ext = selectedFile.name.split('.').pop()?.toLowerCase();
-    if (ext !== 'pdf' && ext !== 'docx' && ext !== 'txt') {
-      setError('Unsupported file type. Please upload a PDF (.pdf) or Word document (.docx).');
+    if (ext !== 'pdf' && ext !== 'docx' && ext !== 'txt' && ext !== 'md') {
+      setError('Unsupported file type. Please upload a PDF (.pdf), Word document (.docx), or Text file (.txt).');
       return;
     }
 
@@ -54,21 +56,21 @@ export const ResumeUploader: React.FC<Props> = ({ onParsed, onCancel }) => {
 
     try {
       setCurrentStep('Reading resume file...');
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 200));
 
       setCurrentStep('Extracting document contents...');
-      const rawText = await extractTextFromFile(selectedFile);
+      const doc = await extractDocumentFromFile(selectedFile);
 
-      if (!rawText || rawText.trim().length < 20) {
+      if (!doc.text || doc.text.trim().length < 10) {
         throw new Error('Could not extract readable text from this document. It might be an image scan or password-protected.');
       }
 
       setCurrentStep('Analyzing professional details & work history...');
-      await new Promise(r => setTimeout(r, 500));
+      await new Promise(r => setTimeout(r, 300));
 
       setCurrentStep('Structuring portfolio sections...');
-      const parsedData = parseResumeText(rawText);
-      await new Promise(r => setTimeout(r, 300));
+      const parsedData = parseResumeText(doc.text, doc.profileImage);
+      await new Promise(r => setTimeout(r, 200));
 
       setIsProcessing(false);
       onParsed(parsedData, selectedFile.name);
@@ -148,6 +150,7 @@ export const ResumeUploader: React.FC<Props> = ({ onParsed, onCancel }) => {
           <span>Supported formats:</span>
           <span className="px-2 py-0.5 rounded bg-white/[0.05] border border-white/[0.08] text-slate-300 font-semibold">.PDF</span>
           <span className="px-2 py-0.5 rounded bg-white/[0.05] border border-white/[0.08] text-slate-300 font-semibold">.DOCX</span>
+          <span className="px-2 py-0.5 rounded bg-white/[0.05] border border-white/[0.08] text-slate-300 font-semibold">.TXT</span>
         </div>
       </div>
 

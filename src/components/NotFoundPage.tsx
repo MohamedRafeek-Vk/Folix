@@ -26,7 +26,7 @@ export const NotFoundPage: React.FC<Props> = ({ requestedSlug, onCreateNew }) =>
           <p className="text-sm text-slate-400 leading-relaxed">
             {requestedSlug ? (
               <>
-                No published portfolio was found at <code className="text-indigo-300 font-mono bg-indigo-500/10 px-1.5 py-0.5 rounded">/p/{requestedSlug}</code> in this browser session.
+                No published portfolio was found at <code className="text-indigo-300 font-mono bg-indigo-500/10 px-1.5 py-0.5 rounded">/p/{requestedSlug}</code>.
               </>
             ) : (
               'The requested page or portfolio does not exist.'
@@ -39,7 +39,7 @@ export const NotFoundPage: React.FC<Props> = ({ requestedSlug, onCreateNew }) =>
           <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08] text-left space-y-2">
             <p className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
               <Globe className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Available Portfolios in Local Storage:</span>
+              <span>Recently Created Portfolios:</span>
             </p>
             <div className="flex flex-wrap gap-1.5">
               {existingSlugs.map(slug => (

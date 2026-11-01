@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PortfolioData } from '../types/portfolio';
-import { getPortfolioBySlug } from '../utils/storage';
+import { fetchPublishedPortfolio, getPublicPortfolioUrl } from '../utils/storage';
 import { TemplateRenderer } from '../templates/TemplateRenderer';
 import { NotFoundPage } from './NotFoundPage';
 import { Sparkles, Edit3, ArrowLeft, Share2, Check } from 'lucide-react';
@@ -17,10 +17,29 @@ export const PublishedPortfolio: React.FC<Props> = ({ slug, onEdit, onHomeClick 
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
     setLoading(true);
-    const found = getPortfolioBySlug(slug);
-    setData(found);
-    setLoading(false);
+
+    async function load() {
+      try {
+        const found = await fetchPublishedPortfolio(slug);
+        if (isMounted) {
+          setData(found);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setData(null);
+          setLoading(false);
+        }
+      }
+    }
+
+    load();
+
+    return () => {
+      isMounted = false;
+    };
   }, [slug]);
 
   if (loading) {
@@ -39,7 +58,8 @@ export const PublishedPortfolio: React.FC<Props> = ({ slug, onEdit, onHomeClick 
   }
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
+    const url = getPublicPortfolioUrl(slug);
+    navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

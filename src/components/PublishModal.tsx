@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PortfolioData } from '../types/portfolio';
-import { sanitizeSlug, savePortfolio, getPortfolioBySlug } from '../utils/storage';
+import { sanitizeSlug, savePortfolio, getPortfolioBySlug, getPublicPortfolioUrl } from '../utils/storage';
 import { Globe, Copy, Check, ExternalLink, AlertTriangle, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -42,8 +42,7 @@ export const PublishModal: React.FC<Props> = ({
 
   if (!isOpen) return null;
 
-  const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173';
-  const fullUrl = `${origin}/p/${cleanSlug}`;
+  const fullUrl = getPublicPortfolioUrl(cleanSlug);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Automatically sanitize and lower-case
@@ -61,7 +60,7 @@ export const PublishModal: React.FC<Props> = ({
       publishedAt: new Date().toISOString()
     };
 
-    const result = savePortfolio(dataToSave);
+    const result = await savePortfolio(dataToSave);
     setIsPublishing(false);
 
     if (result.success) {

@@ -300,7 +300,7 @@ export const LandingPage: React.FC<Props> = ({
             <span className="font-semibold text-slate-300">Folix</span>
             <span>— Instant portfolio generator. Turn your resume into a portfolio in seconds.</span>
           </div>
-          <p>© {new Date().getFullYear()} Folix. Client-side browser storage.</p>
+          <p>© {new Date().getFullYear()} Folix. Instant portfolio generator.</p>
         </div>
       </footer>
 

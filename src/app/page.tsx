@@ -10,9 +10,31 @@ import { TemplateGallery } from '../components/TemplateGallery';
 import { PortfolioPreview } from '../components/PortfolioPreview';
 import { PublishModal } from '../components/PublishModal';
 import { SAMPLE_RESUMES } from '../data/sampleResumes';
-import { savePortfolio, getPortfolioBySlug, getAllPortfolios } from '../utils/storage';
+import { savePortfolio, getPortfolioBySlug, getAllPortfolios, sanitizeSlug } from '../utils/storage';
 
 export type AppView = 'landing' | 'upload' | 'edit' | 'templates' | 'preview';
+
+const createEmptyPortfolio = (): PortfolioData => ({
+  slug: '',
+  name: '',
+  profession: '',
+  summary: '',
+  email: '',
+  phone: '',
+  location: '',
+  profileImage: '',
+  skills: [],
+  technicalSkills: [],
+  softSkills: [],
+  experience: [],
+  education: [],
+  projects: [],
+  certifications: [],
+  achievements: [],
+  socialLinks: {},
+  selectedTemplate: 'modern',
+  publishedAt: new Date().toISOString()
+});
 
 export default function HomePage() {
   const router = useRouter();
@@ -21,40 +43,11 @@ export default function HomePage() {
   const [uploadedFilename, setUploadedFilename] = useState<string>('');
   const [isPublishModalOpen, setIsPublishModalOpen] = useState<boolean>(false);
 
-  // Active Portfolio Data being built
-  const [currentPortfolio, setCurrentPortfolio] = useState<PortfolioData>(() => {
-    const devSample = SAMPLE_RESUMES.softwareEngineer;
-    return {
-      slug: 'rafeek',
-      name: devSample.name || 'Mohamed Rafeek',
-      profession: devSample.profession || 'Senior Full Stack & AI Engineer',
-      summary: devSample.summary || '',
-      email: devSample.email || '',
-      phone: devSample.phone || '',
-      location: devSample.location || '',
-      skills: devSample.skills || [],
-      experience: devSample.experience || [],
-      education: devSample.education || [],
-      projects: devSample.projects || [],
-      certifications: devSample.certifications || [],
-      socialLinks: devSample.socialLinks || {},
-      selectedTemplate: 'modern',
-      publishedAt: new Date().toISOString()
-    };
-  });
+  // Active Portfolio Data being built - starts clean without preloaded dummy content
+  const [currentPortfolio, setCurrentPortfolio] = useState<PortfolioData>(createEmptyPortfolio);
 
   useEffect(() => {
     setMounted(true);
-    // Pre-populate sample 'rafeek' into localStorage if not present
-    const existing = getAllPortfolios();
-    if (!existing['rafeek']) {
-      savePortfolio({
-        ...currentPortfolio,
-        slug: 'rafeek',
-        selectedTemplate: 'modern',
-        publishedAt: new Date().toISOString()
-      });
-    }
 
     // Check if URL has ?edit=slug
     if (typeof window !== 'undefined') {
@@ -77,22 +70,47 @@ export default function HomePage() {
     }
   };
 
-  // 1. Resume Parsed Callback
+  const handleStartCreating = () => {
+    // When starting a new portfolio, ensure state is completely clean
+    if (currentPortfolio.slug === 'rafeek' || currentPortfolio.slug === 'elena' || !currentPortfolio.name) {
+      setCurrentPortfolio(createEmptyPortfolio());
+      setUploadedFilename('');
+    }
+    navigateTo('upload');
+  };
+
+  // 1. Resume Parsed Callback - Fresh extraction without merging old dummy content
   const handleResumeParsed = (extracted: Partial<PortfolioData>, filename: string) => {
     setUploadedFilename(filename);
-    setCurrentPortfolio(prev => ({
-      ...prev,
-      ...extracted,
-      socialLinks: {
-        ...prev.socialLinks,
-        ...(extracted.socialLinks || {})
-      },
-      skills: extracted.skills && extracted.skills.length > 0 ? extracted.skills : prev.skills,
-      experience: extracted.experience && extracted.experience.length > 0 ? extracted.experience : prev.experience,
-      education: extracted.education && extracted.education.length > 0 ? extracted.education : prev.education,
-      projects: extracted.projects && extracted.projects.length > 0 ? extracted.projects : prev.projects,
-      certifications: extracted.certifications && extracted.certifications.length > 0 ? extracted.certifications : prev.certifications,
-    }));
+
+    const baseName = (extracted.name || 'portfolio').trim();
+    const firstWord = baseName.split(/\s+/)[0] || 'portfolio';
+    const generatedSlug = sanitizeSlug(firstWord) || `portfolio-${Date.now().toString(36).slice(-4)}`;
+
+    // Build fresh portfolio state strictly from the newly parsed resume
+    const freshPortfolio: PortfolioData = {
+      slug: generatedSlug,
+      name: extracted.name || '',
+      profession: extracted.profession || '',
+      summary: extracted.summary || '',
+      email: extracted.email || '',
+      phone: extracted.phone || '',
+      location: extracted.location || '',
+      profileImage: extracted.profileImage || '',
+      skills: extracted.skills || [],
+      technicalSkills: extracted.technicalSkills || [],
+      softSkills: extracted.softSkills || [],
+      experience: extracted.experience || [],
+      education: extracted.education || [],
+      projects: extracted.projects || [],
+      certifications: extracted.certifications || [],
+      achievements: extracted.achievements || [],
+      socialLinks: extracted.socialLinks || {},
+      selectedTemplate: currentPortfolio.selectedTemplate || 'modern',
+      publishedAt: new Date().toISOString()
+    };
+
+    setCurrentPortfolio(freshPortfolio);
     navigateTo('edit');
   };
 
@@ -109,7 +127,28 @@ export default function HomePage() {
 
   // 4. Sample Preview from Landing
   const handlePreviewSample = (template: TemplateType) => {
-    setCurrentPortfolio(prev => ({ ...prev, selectedTemplate: template }));
+    const devSample = SAMPLE_RESUMES.softwareEngineer;
+    setCurrentPortfolio({
+      slug: 'rafeek',
+      name: devSample.name || 'Mohamed Rafeek',
+      profession: devSample.profession || 'Senior Full Stack & AI Engineer',
+      summary: devSample.summary || '',
+      email: devSample.email || '',
+      phone: devSample.phone || '',
+      location: devSample.location || '',
+      profileImage: devSample.profileImage || '',
+      skills: devSample.skills || [],
+      technicalSkills: devSample.skills || [],
+      softSkills: [],
+      experience: devSample.experience || [],
+      education: devSample.education || [],
+      projects: devSample.projects || [],
+      certifications: devSample.certifications || [],
+      achievements: devSample.achievements || [],
+      socialLinks: devSample.socialLinks || {},
+      selectedTemplate: template,
+      publishedAt: new Date().toISOString()
+    });
     navigateTo('preview');
   };
 
@@ -146,7 +185,7 @@ export default function HomePage() {
       {/* View Router */}
       {view === 'landing' && (
         <LandingPage
-          onStartCreating={() => navigateTo('upload')}
+          onStartCreating={handleStartCreating}
           onPreviewSample={handlePreviewSample}
           onViewPublished={handleViewPublished}
           onEditPortfolio={handleEditExisting}
@@ -162,6 +201,7 @@ export default function HomePage() {
 
       {view === 'edit' && (
         <ExtractedResumeEditor
+          key={`${uploadedFilename || 'portfolio'}_${currentPortfolio.slug || ''}_${currentPortfolio.name || ''}`}
           initialData={currentPortfolio}
           filename={uploadedFilename}
           onSaveAndContinue={handleEditorContinue}

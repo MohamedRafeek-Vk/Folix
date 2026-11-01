@@ -1,8 +1,31 @@
 import React from 'react';
 import { PortfolioData } from '../types/portfolio';
-import { Mail, MapPin, Phone, Github, Linkedin, Globe, Twitter, ExternalLink, Calendar, ArrowUpRight } from 'lucide-react';
+import { Mail, MapPin, Phone, Github, Linkedin, Globe, Twitter, ArrowUpRight, Sparkles } from 'lucide-react';
 
 export const MinimalTemplate: React.FC<{ data: PortfolioData }> = ({ data }) => {
+  // Sort experience & education descending (most recent first)
+  const sortedExperience = [...(data.experience || [])].sort((a, b) => {
+    const isCurrentA = a.current || /present|current|ongoing/i.test(a.endDate || '');
+    const isCurrentB = b.current || /present|current|ongoing/i.test(b.endDate || '');
+    if (isCurrentA && !isCurrentB) return -1;
+    if (!isCurrentA && isCurrentB) return 1;
+    const yearA = (a.endDate || a.startDate || '').match(/(?:19|20)\d{2}/);
+    const yearB = (b.endDate || b.startDate || '').match(/(?:19|20)\d{2}/);
+    const valA = yearA ? parseInt(yearA[0], 10) : 0;
+    const valB = yearB ? parseInt(yearB[0], 10) : 0;
+    return valB - valA;
+  });
+
+  const sortedEducation = [...(data.education || [])].sort((a, b) => {
+    const yearA = (a.endYear || a.startYear || '').match(/(?:19|20)\d{2}/);
+    const yearB = (b.endYear || b.startYear || '').match(/(?:19|20)\d{2}/);
+    const valA = yearA ? parseInt(yearA[0], 10) : 0;
+    const valB = yearB ? parseInt(yearB[0], 10) : 0;
+    return valB - valA;
+  });
+
+  const hasCertificationsOrAchievements = (data.certifications && data.certifications.length > 0) || (data.achievements && data.achievements.length > 0);
+
   return (
     <div className="min-h-screen bg-[#fafafa] text-zinc-900 font-sans selection:bg-zinc-200">
       {/* Top Header */}
@@ -13,9 +36,11 @@ export const MinimalTemplate: React.FC<{ data: PortfolioData }> = ({ data }) => 
           </a>
           <nav className="flex items-center gap-6 text-sm text-zinc-600">
             {data.summary && <a href="#about" className="hover:text-zinc-950 transition">About</a>}
-            {data.experience?.length > 0 && <a href="#experience" className="hover:text-zinc-950 transition">Experience</a>}
-            {data.projects?.length > 0 && <a href="#projects" className="hover:text-zinc-950 transition">Projects</a>}
             {data.skills?.length > 0 && <a href="#skills" className="hover:text-zinc-950 transition">Skills</a>}
+            {sortedExperience.length > 0 && <a href="#experience" className="hover:text-zinc-950 transition">Experience</a>}
+            {data.projects?.length > 0 && <a href="#projects" className="hover:text-zinc-950 transition">Projects</a>}
+            {sortedEducation.length > 0 && <a href="#education" className="hover:text-zinc-950 transition">Education</a>}
+            {hasCertificationsOrAchievements && <a href="#certifications" className="hover:text-zinc-950 transition">Credentials</a>}
             <a href="#contact" className="px-3.5 py-1.5 rounded-full bg-zinc-900 text-white text-xs font-medium hover:bg-zinc-800 transition">
               Contact
             </a>
@@ -24,16 +49,25 @@ export const MinimalTemplate: React.FC<{ data: PortfolioData }> = ({ data }) => 
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-16 space-y-20">
-        {/* Hero Section */}
+        {/* 1. Hero / Introduction */}
         <section className="space-y-6 pt-4">
           <div className="space-y-2">
             <span className="text-xs font-mono uppercase tracking-widest text-zinc-400">Personal Portfolio</span>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-950">
-              {data.name || 'Your Name'}
-            </h1>
-            <p className="text-xl md:text-2xl text-zinc-600 font-light">
-              {data.profession || 'Professional Title'}
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-5 pt-1">
+              {data.profileImage && (
+                <div className="w-20 h-20 rounded-full overflow-hidden border border-zinc-300 shrink-0 shadow-sm">
+                  <img src={data.profileImage} alt={data.name} className="w-full h-full object-cover" />
+                </div>
+              )}
+              <div>
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-950">
+                  {data.name || 'Your Name'}
+                </h1>
+                <p className="text-xl md:text-2xl text-zinc-600 font-light mt-1">
+                  {data.profession || 'Professional Title'}
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-600 pt-2">
@@ -82,25 +116,67 @@ export const MinimalTemplate: React.FC<{ data: PortfolioData }> = ({ data }) => 
           </div>
         </section>
 
-        {/* About Section */}
+        {/* 2. About Me */}
         {data.summary && (
           <section id="about" className="space-y-4 pt-4 border-t border-zinc-200">
-            <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-400">About</h2>
+            <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-400">About Me</h2>
             <p className="text-lg text-zinc-700 leading-relaxed font-normal">
               {data.summary}
             </p>
           </section>
         )}
 
-        {/* Experience Section */}
-        {data.experience?.length > 0 && (
+        {/* 3. Skills */}
+        {data.skills?.length > 0 && (
+          <section id="skills" className="space-y-6 pt-4 border-t border-zinc-200">
+            <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-400">Skills & Expertise</h2>
+            <div className="space-y-4">
+              {data.technicalSkills && data.technicalSkills.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-xs text-zinc-500 font-mono">Technical</span>
+                  <div className="flex flex-wrap gap-2">
+                    {data.technicalSkills.map((skill, i) => (
+                      <span key={i} className="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-zinc-200 text-zinc-800 shadow-sm">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {data.softSkills && data.softSkills.length > 0 && (
+                <div className="space-y-2 pt-2">
+                  <span className="text-xs text-zinc-500 font-mono">Core Competencies</span>
+                  <div className="flex flex-wrap gap-2">
+                    {data.softSkills.map((skill, i) => (
+                      <span key={i} className="px-3.5 py-1.5 rounded-full text-xs font-medium bg-zinc-100 border border-zinc-200 text-zinc-700">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {(!data.technicalSkills || data.technicalSkills.length === 0) && (!data.softSkills || data.softSkills.length === 0) && (
+                <div className="flex flex-wrap gap-2">
+                  {data.skills.map((skill, i) => (
+                    <span key={i} className="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-zinc-200 text-zinc-800 shadow-sm">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* 4. Work Experience */}
+        {sortedExperience.length > 0 && (
           <section id="experience" className="space-y-8 pt-4 border-t border-zinc-200">
             <div className="flex items-baseline justify-between">
-              <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-400">Experience</h2>
-              <span className="text-xs text-zinc-400 font-mono">{data.experience.length} Positions</span>
+              <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-400">Work Experience</h2>
+              <span className="text-xs text-zinc-400 font-mono">{sortedExperience.length} Positions</span>
             </div>
             <div className="space-y-10">
-              {data.experience.map(exp => (
+              {sortedExperience.map(exp => (
                 <div key={exp.id} className="space-y-3 group">
                   <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
                     <div>
@@ -136,7 +212,7 @@ export const MinimalTemplate: React.FC<{ data: PortfolioData }> = ({ data }) => 
           </section>
         )}
 
-        {/* Projects Section */}
+        {/* 5. Projects Section */}
         {data.projects?.length > 0 && (
           <section id="projects" className="space-y-8 pt-4 border-t border-zinc-200">
             <div className="flex items-baseline justify-between">
@@ -174,55 +250,65 @@ export const MinimalTemplate: React.FC<{ data: PortfolioData }> = ({ data }) => 
           </section>
         )}
 
-        {/* Skills Section */}
-        {data.skills?.length > 0 && (
-          <section id="skills" className="space-y-6 pt-4 border-t border-zinc-200">
-            <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-400">Skills & Expertise</h2>
-            <div className="flex flex-wrap gap-2">
-              {data.skills.map((skill, i) => (
-                <span key={i} className="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-zinc-200 text-zinc-800">
-                  {skill}
-                </span>
+        {/* 6. Education */}
+        {sortedEducation.length > 0 && (
+          <section id="education" className="space-y-6 pt-4 border-t border-zinc-200">
+            <div className="flex items-baseline justify-between">
+              <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-400">Education</h2>
+              <span className="text-xs text-zinc-400 font-mono">{sortedEducation.length} Institutions</span>
+            </div>
+            <div className="space-y-6">
+              {sortedEducation.map(edu => (
+                <div key={edu.id} className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                  <div className="space-y-1">
+                    <h3 className="font-medium text-zinc-900 text-base">{edu.degree}</h3>
+                    <p className="text-sm text-zinc-600">{edu.institution} {edu.location ? `• ${edu.location}` : ''}</p>
+                    {edu.fieldOfStudy && <p className="text-xs text-zinc-500">{edu.fieldOfStudy}</p>}
+                  </div>
+                  <span className="text-xs text-zinc-400 font-mono shrink-0">{edu.endYear}</span>
+                </div>
               ))}
             </div>
           </section>
         )}
 
-        {/* Education & Certifications */}
-        {(data.education?.length > 0 || data.certifications?.length > 0) && (
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-4 border-t border-zinc-200">
-            {data.education?.length > 0 && (
-              <div className="space-y-4">
-                <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-400">Education</h2>
+        {/* 7. Certifications & Achievements */}
+        {hasCertificationsOrAchievements && (
+          <section id="certifications" className="space-y-6 pt-4 border-t border-zinc-200">
+            <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-400">Certifications & Achievements</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {data.certifications && data.certifications.length > 0 && (
                 <div className="space-y-4">
-                  {data.education.map(edu => (
-                    <div key={edu.id} className="space-y-1">
-                      <h3 className="font-medium text-zinc-900 text-sm">{edu.degree}</h3>
-                      <p className="text-xs text-zinc-600">{edu.institution}</p>
-                      <span className="text-xs text-zinc-400 font-mono">{edu.endYear}</span>
-                    </div>
-                  ))}
+                  <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider font-mono">Certifications</h3>
+                  <div className="space-y-3">
+                    {data.certifications.map(c => (
+                      <div key={c.id} className="space-y-1">
+                        <h4 className="font-medium text-zinc-900 text-sm">{c.name}</h4>
+                        <p className="text-xs text-zinc-600">{c.issuer} {c.date ? `• ${c.date}` : ''}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {data.certifications?.length > 0 && (
-              <div className="space-y-4">
-                <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-400">Certifications</h2>
+              {data.achievements && data.achievements.length > 0 && (
                 <div className="space-y-4">
-                  {data.certifications.map(c => (
-                    <div key={c.id} className="space-y-1">
-                      <h3 className="font-medium text-zinc-900 text-sm">{c.name}</h3>
-                      <p className="text-xs text-zinc-600">{c.issuer} • {c.date}</p>
-                    </div>
-                  ))}
+                  <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider font-mono">Key Achievements</h3>
+                  <div className="space-y-2">
+                    {data.achievements.map((ach, idx) => (
+                      <div key={idx} className="flex items-start gap-2 text-xs text-zinc-700">
+                        <Sparkles className="w-3.5 h-3.5 text-zinc-400 shrink-0 mt-0.5" />
+                        <span>{ach}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </section>
         )}
 
-        {/* Contact CTA Section */}
+        {/* 8. Contact CTA Section */}
         <section id="contact" className="p-8 rounded-3xl bg-zinc-900 text-white space-y-4">
           <span className="text-xs font-mono uppercase tracking-widest text-zinc-400">Get In Touch</span>
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight">

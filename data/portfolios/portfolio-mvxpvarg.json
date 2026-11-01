@@ -1,0 +1,203 @@
+{
+  "slug": "portfolio-mvxpvarg",
+  "name": "MOHAMED FAROOK S",
+  "profession": "Full Stack Developer",
+  "summary": "Computer Science Engineering undergraduate aspiring to work as a Software Developer Intern. Strong foundation in programming, data structures, and web development. Passionate about building efficient, scalable software solutions and eager to gain real-world industry experience.",
+  "email": "farhanamdu1@gmail.com",
+  "phone": "",
+  "location": "",
+  "skills": [
+    "Programming Languages: Java",
+    "Python",
+    "Web Technologies: HTML",
+    "CSS",
+    "JavaScript",
+    "React.js",
+    "Backend Technologies: Node.js",
+    "Express.js",
+    "MongoDB",
+    "Firebase",
+    "Supabase",
+    "Core Concepts: Data Structures",
+    "OOPS",
+    "Git",
+    "GitHub",
+    "VS Code",
+    "n8n",
+    "Kali Linux Tools"
+  ],
+  "technicalSkills": [
+    "Programming Languages: Java",
+    "Python",
+    "Web Technologies: HTML",
+    "CSS",
+    "JavaScript",
+    "React.js",
+    "Backend Technologies: Node.js",
+    "Express.js",
+    "MongoDB",
+    "Firebase",
+    "Supabase",
+    "Core Concepts: Data Structures",
+    "OOPS",
+    "Git",
+    "GitHub",
+    "VS Code",
+    "n8n",
+    "Kali Linux Tools"
+  ],
+  "softSkills": [],
+  "experience": [
+    {
+      "id": "exp-1",
+      "role": "Frontend / UI Engineer Intern",
+      "company": "Pheonix Softech",
+      "location": "",
+      "startDate": "2021",
+      "endDate": "Present",
+      "current": true,
+      "description": "Duration: 1 Month",
+      "highlights": []
+    },
+    {
+      "id": "exp-2",
+      "role": "Internship Certificate / LinkedIn Post",
+      "company": "Organization",
+      "location": "",
+      "startDate": "2021",
+      "endDate": "Present",
+      "current": true,
+      "description": "responsiveness, and usability. screens. visual consistency.",
+      "highlights": [
+        "Worked on translating UI/UX designs into user-friendly web interfaces, focusing on layout structure,",
+        "Collaborated with designers and developers to improve user flows and interface consistency across web",
+        "Applied frontend best practices such as component-based layouts, accessibility considerations, and"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "id": "edu-2",
+      "degree": "Degree",
+      "institution": "Saveetha Engineering College",
+      "location": "",
+      "endYear": "2027",
+      "fieldOfStudy": ""
+    },
+    {
+      "id": "edu-1",
+      "degree": "B.E / B.Tech",
+      "institution": "Computer Science and Engineering",
+      "location": "IoT",
+      "endYear": "2020",
+      "fieldOfStudy": ""
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-1",
+      "title": "DRESTEIN — College Event Registration Platform React, Node.js, Firebase",
+      "description": "Role: Full Stack Developer",
+      "technologies": [],
+      "link": "https://www.drestein.in/",
+      "featured": true
+    },
+    {
+      "id": "proj-2",
+      "title": "https://www.drestein.in/",
+      "description": "• Led the design and development of the official event registration platform, handling 1,00,000+ page views and 6,000+ users.\n• Integrated CC Avenue payment gateway, securely processing 5,00,000+ in registration transactions.\n• Built a scalable and responsive system using Firebase authentication and database to manage events, users, and registrations efficiently. Frontenlab — Frontend Practice Platform HTML, CSS, JavaScript, React.js",
+      "technologies": [],
+      "featured": true
+    },
+    {
+      "id": "proj-3",
+      "title": "Role: Frontend Developer",
+      "description": "https://www.frontenlab.com/\n• Worked on a frontend practice platform that enables users to view, download, and replicate designs to improve frontend development proficiency.\n• Developed responsive UI components and ensured design accuracy across different screen sizes.\n• Focused on clean code practices, reusability, and performance optimization. Legal Document Analyzer Generative AI, Gemini API, Python",
+      "technologies": [],
+      "link": "https://www.frontenlab.com/",
+      "featured": true
+    },
+    {
+      "id": "proj-4",
+      "title": "Role: Developer",
+      "description": "• Developed a system to analyze legal documents related to registration, loan, and banking processes using the Gemini API for intelligent document understanding.\n• Automated extraction and interpretation of key information from legal documents to assist in faster and more accurate review processes.",
+      "technologies": [],
+      "featured": true
+    },
+    {
+      "id": "proj-5",
+      "title": "1",
+      "description": "",
+      "technologies": [],
+      "featured": true
+    }
+  ],
+  "certifications": [
+    {
+      "id": "cert-1",
+      "name": "Mastering AWS Serverless: Hands",
+      "issuer": "On with Core AWS Services",
+      "date": "2023"
+    },
+    {
+      "id": "cert-2",
+      "name": "Programming with Cloud IoT Platforms",
+      "issuer": "Coursera",
+      "date": "2023"
+    },
+    {
+      "id": "cert-3",
+      "name": "Achievements & Activities",
+      "issuer": "Certified Authority",
+      "date": "2023"
+    },
+    {
+      "id": "cert-4",
+      "name": "Smart India Hackathon : Shortlisted among the Top 50 teams at the college level for proposing",
+      "issuer": "Certified Authority",
+      "date": "2025"
+    },
+    {
+      "id": "cert-5",
+      "name": "a Smart Learning System tailored for students with Autism, ADHD, and Dyslexia.",
+      "issuer": "Certified Authority",
+      "date": "2023"
+    },
+    {
+      "id": "cert-6",
+      "name": "SuperOps Hackathon 2025) : Idea Shortlisted Project idea shortlisted for developing an AI",
+      "issuer": "powered",
+      "date": "2025"
+    },
+    {
+      "id": "cert-7",
+      "name": "Ticket Auto",
+      "issuer": "Responder for IT Service Management.",
+      "date": "2023"
+    },
+    {
+      "id": "cert-8",
+      "name": "Declaration",
+      "issuer": "Certified Authority",
+      "date": "2023"
+    },
+    {
+      "id": "cert-9",
+      "name": "I hereby declare that the above information is true and correct to the best of my knowledge.",
+      "issuer": "Certified Authority",
+      "date": "2023"
+    }
+  ],
+  "achievements": [],
+  "socialLinks": {
+    "github": "https://github.com/MOHAMEDFAROOK2005",
+    "linkedin": "https://linkedin.com/in/mohamed-farook-s-2aa0352b2",
+    "website": "https://B.Tech",
+    "twitter": "",
+    "email": "farhanamdu1@gmail.com"
+  },
+  "selectedTemplate": "developer",
+  "publishedAt": "2026-11-01T10:58:16.580Z",
+  "updatedAt": "2026-11-01T10:58:17.020Z",
+  "id": "folix-portfolio-mvxpvarg-mvxpvce0"
+}

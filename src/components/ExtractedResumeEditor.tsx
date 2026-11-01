@@ -24,6 +24,7 @@ export const ExtractedResumeEditor: React.FC<Props> = ({
   const [email, setEmail] = useState(initialData.email || '');
   const [phone, setPhone] = useState(initialData.phone || '');
   const [location, setLocation] = useState(initialData.location || '');
+  const [profileImage, setProfileImage] = useState(initialData.profileImage || '');
 
   // Skills
   const [skills, setSkills] = useState<string[]>(initialData.skills || []);
@@ -40,6 +41,10 @@ export const ExtractedResumeEditor: React.FC<Props> = ({
 
   // Certifications
   const [certifications, setCertifications] = useState<Certification[]>(initialData.certifications || []);
+
+  // Achievements
+  const [achievements, setAchievements] = useState<string[]>(initialData.achievements || []);
+  const [newAchievementInput, setNewAchievementInput] = useState('');
 
   // Social Links
   const [github, setGithub] = useState(initialData.socialLinks?.github || '');
@@ -141,6 +146,17 @@ export const ExtractedResumeEditor: React.FC<Props> = ({
     setCertifications(certifications.filter(c => c.id !== id));
   };
 
+  const handleAddAchievement = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!newAchievementInput.trim()) return;
+    setAchievements([...achievements, newAchievementInput.trim()]);
+    setNewAchievementInput('');
+  };
+
+  const handleRemoveAchievement = (index: number) => {
+    setAchievements(achievements.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -152,11 +168,15 @@ export const ExtractedResumeEditor: React.FC<Props> = ({
       email: email.trim(),
       phone: phone.trim(),
       location: location.trim(),
+      profileImage: profileImage.trim() || undefined,
       skills,
+      technicalSkills: initialData.technicalSkills || skills,
+      softSkills: initialData.softSkills || [],
       experience,
       education,
       projects,
       certifications,
+      achievements,
       socialLinks: {
         github: github.trim(),
         linkedin: linkedin.trim(),
@@ -337,7 +357,7 @@ export const ExtractedResumeEditor: React.FC<Props> = ({
                 />
               </div>
 
-              <div className="space-y-1.5 sm:col-span-2">
+              <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-slate-300">Location</label>
                 <input
                   type="text"
@@ -346,6 +366,24 @@ export const ExtractedResumeEditor: React.FC<Props> = ({
                   placeholder="e.g. San Francisco, CA or Remote"
                   className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-white/[0.08] focus:border-indigo-500 focus:outline-none text-white text-sm"
                 />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-300">Profile Image (URL or Data URI)</label>
+                <div className="flex items-center gap-3">
+                  {profileImage && (
+                    <div className="w-10 h-10 rounded-full overflow-hidden border border-indigo-500/40 shrink-0 bg-slate-800">
+                      <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <input
+                    type="text"
+                    value={profileImage}
+                    onChange={e => setProfileImage(e.target.value)}
+                    placeholder="https://... or data:image/..."
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-slate-900 border border-white/[0.08] focus:border-indigo-500 focus:outline-none text-white text-sm"
+                  />
+                </div>
               </div>
 
               <div className="space-y-1.5 sm:col-span-2">
@@ -403,7 +441,7 @@ export const ExtractedResumeEditor: React.FC<Props> = ({
                     onClick={() => handleRemoveSkill(skill)}
                     className="text-slate-400 hover:text-red-400 transition"
                   >
-                    ×
+                    Ã—
                   </button>
                 </span>
               ))}
@@ -703,6 +741,50 @@ export const ExtractedResumeEditor: React.FC<Props> = ({
                       className="text-slate-500 hover:text-red-400 p-1"
                     >
                       <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Achievements & Honors */}
+            <div className="space-y-4 pt-4 border-t border-white/[0.06]">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <span>Key Achievements & Honors ({achievements.length})</span>
+                </h3>
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newAchievementInput}
+                  onChange={e => setNewAchievementInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddAchievement(); } }}
+                  placeholder="e.g. Winner of National Cloud Hackathon 2023 or Published IEEE Paper"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-slate-900 border border-white/[0.08] focus:border-indigo-500 focus:outline-none text-white text-xs"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleAddAchievement()}
+                  className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-semibold text-xs flex items-center gap-1.5 transition"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add</span>
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                {achievements.map((ach, idx) => (
+                  <div key={idx} className="p-3 rounded-xl bg-slate-900/80 border border-white/[0.08] flex items-center justify-between gap-3 text-xs text-slate-200">
+                    <span className="flex-1 leading-relaxed">{ach}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveAchievement(idx)}
+                      className="text-slate-500 hover:text-red-400 p-1"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ))}
